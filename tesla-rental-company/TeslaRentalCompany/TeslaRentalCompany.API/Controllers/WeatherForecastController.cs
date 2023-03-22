@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TeslaRentalCompany.web.Controllers
+namespace TeslaRentalCompany.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]

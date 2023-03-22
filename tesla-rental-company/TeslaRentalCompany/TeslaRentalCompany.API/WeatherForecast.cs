@@ -1,4 +1,4 @@
-namespace TeslaRentalCompany.web
+namespace TeslaRentalCompany.API
 {
     public class WeatherForecast
     {
