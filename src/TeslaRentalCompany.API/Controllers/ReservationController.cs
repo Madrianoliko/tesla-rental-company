@@ -4,20 +4,31 @@ using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class ReservationController : ControllerBase
     {
         [HttpGet]
-        public JsonResult GetReservations()
+        public ActionResult<IEnumerable<Reservation>> GetReservations()
         {
-            return new JsonResult(ReservationDataStore.Current.Reservations);
+            var reservations = ReservationDataStore.Current.Reservations;
+
+            return Ok(reservations);
         }
+
+
         [HttpGet("{id}")]
-        public JsonResult GetReservation(int id)
+        public ActionResult<Reservation> GetReservation(int id)
         {
-            return new JsonResult(
-                    ReservationDataStore.Current.Reservations.FirstOrDefault(r => r.Id == id));
+            var reservationToReturn = ReservationDataStore.Current.Reservations.FirstOrDefault(r => r.Id == id);
+
+            if (reservationToReturn == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(reservationToReturn);
+
         }
     }
-} 
+}
