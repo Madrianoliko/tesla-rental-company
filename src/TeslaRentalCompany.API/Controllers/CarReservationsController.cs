@@ -7,7 +7,7 @@ namespace TeslaRentalCompany.API.Controllers
 {
     [Route("api/car/reservation")]
     [ApiController]
-    public class CarReservationController : ControllerBase
+    public class CarReservationsController : ControllerBase
     {
         [HttpGet]
         public ActionResult<IEnumerable<Reservation>> GetReservationsForCar(int carId)
@@ -21,7 +21,7 @@ namespace TeslaRentalCompany.API.Controllers
 
             return Ok(car.ListOfReservations);
         }
-        [HttpGet("{reservation}")]
+        [HttpGet("{reservationId}")]
         public ActionResult<Reservation> GetReservationForCar(int carId, int reservationId)
         {
             var car = ReservationDataStore.Current.Cars.FirstOrDefault(c => c.Id == carId);

@@ -15,6 +15,6 @@ namespace TeslaRentalCompany.Data.Models
         public int Status { get; set; }
         // TODO obliczanie kosztu za pomocą obliczania dni razy koszt per dzien samochodu
         //public int Cost { get; set; }
-        public bool IsCanceled { get; set; } = false;
+        public bool IsCanceled { get; set; }
     }
 }

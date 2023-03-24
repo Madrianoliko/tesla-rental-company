@@ -14,4 +14,10 @@
     <ProjectReference Include="..\TeslaRentalCompany.Data\TeslaRentalCompany.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="FileToDownload.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -30,5 +30,28 @@ namespace TeslaRentalCompany.API.Controllers
             return Ok(reservationToReturn);
 
         }
+        [HttpPost]
+        public ActionResult<Reservation> CreateReservation(
+            int carId,
+            ReservationForCreation reservation)
+        {
+            var car = ReservationDataStore.Current.Cars.FirstOrDefault(c => c.Id == carId);
+            if (car == null) { return NotFound(); }
+
+            var maxReservation = ReservationDataStore.Current.Reservations.Max(r => r.Id);
+
+            var finalReservation = new Reservation()
+            {
+                Id = ++maxReservation,
+                CarId = carId,
+                StartDate = reservation.StartDate,
+                EndDate = reservation.EndDate,
+                Status = 1,
+                IsCanceled = false
+            };
+
+            car.ListOfReservations.Add(finalReservation);
+            return Ok(finalReservation);
+        }
     }
 }
