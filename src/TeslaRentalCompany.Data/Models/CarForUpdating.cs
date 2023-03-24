@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TeslaRentalCompany.Data.Models
 {
-    public class CarForCreation
+    public class CarForUpdating
     {
         [Required(ErrorMessage = "You should provide model name")]
         [MaxLength(100)]
