@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace TeslaRentalCompany.Data.Models
 {
-    public class Car
+    public class CarDto
     {
         public int Id { get; set; }
         public string Model { get; set; }
-        public DateOnly YearOfManufacture { get; set; }
+        public DateTime YearOfManufacture { get; set; }
         public int Range { get; set; }
         public int CostPerDay { get; set; }
         public int NumberOfReservations 
@@ -21,8 +21,8 @@ namespace TeslaRentalCompany.Data.Models
             }
         }
 
-        public ICollection<Reservation> ListOfReservations { get; set; } 
-            = new List<Reservation>();
+        public ICollection<ReservationDto> ListOfReservations { get; set; } 
+            = new List<ReservationDto>();
     }
 }
   

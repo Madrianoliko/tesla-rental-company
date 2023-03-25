@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using TeslaRentalCompany.API;
+using TeslaRentalCompany.API.DbContexts;
 using TeslaRentalCompany.API.Interfaces;
 using TeslaRentalCompany.API.Services;
 using TeslaRentalCompany.Data;
@@ -28,8 +30,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IMailService, LocalMailService>();
-builder.Services.AddSingleton<IReservationDataStore, ReservationDataStore>();
+builder.Services.AddSingleton<ISeedDataService, SeedDataService>();
 
+builder.Services.AddDbContext<TeslaRentalCompanyContext>(
+    dbContextOptions => dbContextOptions.UseSqlServer( 
+        builder.Configuration["ConnectionStrings:TeslaCarCompanyConnectionString"]));
+    
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

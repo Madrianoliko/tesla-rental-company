@@ -10,23 +10,23 @@ namespace TeslaRentalCompany.API.Controllers
     [ApiController]
     public class CarController : ControllerBase
     {
-        private readonly IReservationDataStore reservationDataStore;
+        private readonly ISeedDataService seedData;
 
-        public CarController(IReservationDataStore reservationDataStore)
+        public CarController(ISeedDataService seedData)
         {
-            this.reservationDataStore = reservationDataStore ?? throw new ArgumentNullException(nameof(reservationDataStore));
+            this.seedData = seedData ?? throw new ArgumentNullException(nameof(seedData));
         }
         [HttpGet]
-        public ActionResult<List<Car>> GetCars ()
+        public ActionResult<List<CarDto>> GetCars ()
         {
-            var cars = reservationDataStore.Cars;
+            var cars = seedData.Cars;
 
             return Ok(cars);
         }
         [HttpGet("{carId}")]
-        public ActionResult<Car> GetCar (int carId)
+        public ActionResult<CarDto> GetCar (int carId)
         {
-            var car = reservationDataStore.Cars.FirstOrDefault(x => x.Id == carId);
+            var car = seedData.Cars.FirstOrDefault(x => x.Id == carId);
             
             if (car == null)
             {

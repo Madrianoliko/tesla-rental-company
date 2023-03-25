@@ -10,16 +10,16 @@ namespace TeslaRentalCompany.API.Controllers
     [ApiController]
     public class CarReservationsController : ControllerBase
     {
-        private readonly IReservationDataStore reservationDataStore;
+        private readonly ISeedDataService seedData;
 
-        public CarReservationsController(IReservationDataStore reservationDataStore)
+        public CarReservationsController(ISeedDataService seedData)
         {
-            this.reservationDataStore = reservationDataStore ?? throw new ArgumentNullException(nameof(reservationDataStore));
+            this.seedData = seedData ?? throw new ArgumentNullException(nameof(seedData));
         }
         [HttpGet]
-        public ActionResult<IEnumerable<Reservation>> GetReservationsForCar(int carId)
+        public ActionResult<IEnumerable<ReservationDto>> GetReservationsForCar(int carId)
         {
-            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
 
             if (car == null)
             {
@@ -29,9 +29,9 @@ namespace TeslaRentalCompany.API.Controllers
             return Ok(car.ListOfReservations);
         }
         [HttpGet("{reservationId}")]
-        public ActionResult<Reservation> GetReservationForCar(int carId, int reservationId)
+        public ActionResult<ReservationDto> GetReservationForCar(int carId, int reservationId)
         {
-            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
 
             if (car == null)
             {

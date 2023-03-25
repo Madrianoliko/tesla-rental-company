@@ -13,7 +13,7 @@ namespace TeslaRentalCompany.Data.Models
         [MaxLength(100)]
         public string? Model { get; set; }
         [Required]
-        public DateOnly YearOfManufacture { get; set; }
+        public DateTime YearOfManufacture { get; set; }
         [Required]
         public int Range { get; set; }
         [Required]

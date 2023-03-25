@@ -3,17 +3,17 @@ using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.Data
 {
-    public class ReservationDataStore : IReservationDataStore
+    public class SeedDataService : ISeedDataService
     {
-        public List<Reservation> Reservations { get; set; }
-        public List<Car> Cars { get; set; }
+        public List<ReservationDto> Reservations { get; set; }
+        public List<CarDto> Cars { get; set; }
         //public static ReservationDataStore Current { get; } = new ReservationDataStore();
 
-        public ReservationDataStore()
+        public SeedDataService()
         {
-            Reservations = new List<Reservation>()
+            Reservations = new List<ReservationDto>()
             {
-                new Reservation()
+                new ReservationDto()
                 {
                     Id = 1,
                     CarId = 1,
@@ -21,7 +21,7 @@ namespace TeslaRentalCompany.Data
                     EndDate = new DateTime(2023, 4, 20, 13, 45, 0),
                     Status = 1,
                 },
-                new Reservation()
+                new ReservationDto()
                 {
                     Id = 2,
                     CarId = 1,
@@ -29,7 +29,7 @@ namespace TeslaRentalCompany.Data
                     EndDate = new DateTime(2023, 1, 10, 13, 45, 0),
                     Status = 3,
                 },
-                new Reservation()
+                new ReservationDto()
                 {
                     Id = 3,
                     CarId = 2,
@@ -37,7 +37,7 @@ namespace TeslaRentalCompany.Data
                     EndDate = new DateTime(2023, 3, 21, 13, 45, 0),
                     Status = 2
                 },
-                new Reservation()
+                new ReservationDto()
                 {
                     Id = 4,
                     CarId = 2,
@@ -46,27 +46,27 @@ namespace TeslaRentalCompany.Data
                     Status = 3
                 },
             };
-            Cars = new List<Car>()
+            Cars = new List<CarDto>()
             {
-                new Car()
+                new CarDto()
                 {
                     Id = 1,
                     Model = "X",
                     Range = 400,
-                    YearOfManufacture = new DateOnly(2020, 5, 3),
+                    YearOfManufacture = new DateTime(2020, 5, 3, 0, 0, 0),
                     CostPerDay = 300,
                 },
-                new Car()
+                new CarDto()
                 {
                     Id = 2,
                     Model = "Y",
                     Range = 300,
-                    YearOfManufacture = new DateOnly(2019, 1, 2),
+                    YearOfManufacture = new DateTime(2019, 1, 2, 0, 0, 0),
                     CostPerDay = 150,
                 },
             };
 
-            foreach (Car car in Cars)
+            foreach (CarDto car in Cars)
             {
 
                 car.ListOfReservations = Reservations.FindAll(r => r.CarId == car.Id);

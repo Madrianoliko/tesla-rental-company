@@ -12,34 +12,34 @@ namespace TeslaRentalCompany.API.Controllers
     {
         private readonly ILogger<ReservationController> logger;
         private readonly IMailService mailService;
-        private readonly IReservationDataStore reservationDataStore;
+        private readonly ISeedDataService seedData;
 
         public ReservationController(
             ILogger<ReservationController> logger,
             IMailService mailService,
-            IReservationDataStore reservationDataStore
+            ISeedDataService seedData
             )
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
-            this.reservationDataStore = reservationDataStore ?? throw new ArgumentNullException(nameof(reservationDataStore));
+            this.seedData = seedData ?? throw new ArgumentNullException(nameof(seedData));
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Reservation>> GetReservations()
+        public ActionResult<IEnumerable<ReservationDto>> GetReservations()
         {
-            var reservations = reservationDataStore.Reservations;
+            var reservations = seedData.Reservations;
 
             return Ok(reservations);
         }
 
 
         [HttpGet("{reservationId}")]
-        public ActionResult<Reservation> GetReservation(int reservationId)
+        public ActionResult<ReservationDto> GetReservation(int reservationId)
         {
             try
             {
-                var reservationToReturn = reservationDataStore.Reservations.FirstOrDefault(r => r.Id == reservationId);
+                var reservationToReturn = seedData.Reservations.FirstOrDefault(r => r.Id == reservationId);
 
                 if (reservationToReturn == null)
                 {
@@ -60,16 +60,16 @@ namespace TeslaRentalCompany.API.Controllers
 
         }
         [HttpPost]
-        public ActionResult<Reservation> CreateReservation(
+        public ActionResult<ReservationDto> CreateReservation(
             int carId,
             ReservationForCreation reservation)
         {
-            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
             if (car == null) { return NotFound(); }
 
-            var maxReservation = reservationDataStore.Reservations.Max(r => r.Id);
+            var maxReservation = seedData.Reservations.Max(r => r.Id);
 
-            var finalReservation = new Reservation()
+            var finalReservation = new ReservationDto()
             {
                 Id = ++maxReservation,
                 CarId = carId,
@@ -88,7 +88,7 @@ namespace TeslaRentalCompany.API.Controllers
             int reservationId,
             ReservationForUpdating reservation)
         {
-            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
             if (car == null) { return NotFound(); }
 
             var reservationToEdit = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
@@ -104,7 +104,7 @@ namespace TeslaRentalCompany.API.Controllers
             int reservationId,
             JsonPatchDocument<ReservationForUpdating> patchDocument)
         {
-            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
             if (car == null) { return NotFound(); }
 
             var reservationFromStore = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
@@ -138,7 +138,7 @@ namespace TeslaRentalCompany.API.Controllers
             int carId,
             int reservationId)
         {
-            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
             if (car == null) { return NotFound(); }
 
             var reservationFromStore = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
