@@ -1,8 +1,9 @@
-﻿using TeslaRentalCompany.Data.Models;
+﻿using TeslaRentalCompany.API.Interfaces;
+using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.Data
 {
-    public class ReservationDataStore
+    public class ReservationDataStore : IReservationDataStore
     {
         public List<Reservation> Reservations { get; set; }
         public List<Car> Cars { get; set; }

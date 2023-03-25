@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using TeslaRentalCompany.API.Interfaces;
 using TeslaRentalCompany.Data;
 using TeslaRentalCompany.Data.Models;
 
@@ -9,26 +10,53 @@ namespace TeslaRentalCompany.API.Controllers
     [ApiController]
     public class ReservationController : ControllerBase
     {
+        private readonly ILogger<ReservationController> logger;
+        private readonly IMailService mailService;
+        private readonly IReservationDataStore reservationDataStore;
+
+        public ReservationController(
+            ILogger<ReservationController> logger,
+            IMailService mailService,
+            IReservationDataStore reservationDataStore
+            )
+        {
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
+            this.reservationDataStore = reservationDataStore ?? throw new ArgumentNullException(nameof(reservationDataStore));
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<Reservation>> GetReservations()
         {
-            var reservations = ReservationDataStore.Current.Reservations;
+            var reservations = reservationDataStore.Reservations;
 
             return Ok(reservations);
         }
 
 
-        [HttpGet("{id}")]
-        public ActionResult<Reservation> GetReservation(int id)
+        [HttpGet("{reservationId}")]
+        public ActionResult<Reservation> GetReservation(int reservationId)
         {
-            var reservationToReturn = ReservationDataStore.Current.Reservations.FirstOrDefault(r => r.Id == id);
-
-            if (reservationToReturn == null)
+            try
             {
-                return NotFound();
+                var reservationToReturn = reservationDataStore.Reservations.FirstOrDefault(r => r.Id == reservationId);
+
+                if (reservationToReturn == null)
+                {
+                    logger.LogInformation("Reservation not found");
+                    return NotFound();
+                }
+
+                return Ok(reservationToReturn);
+            }
+            catch(Exception ex)
+            {
+                logger.LogCritical(
+                    $"Exception whlie getting reservation with id {reservationId}",
+                    ex);
+                return StatusCode(500, "A problem happend while handling your request");
             }
 
-            return Ok(reservationToReturn);
 
         }
         [HttpPost]
@@ -36,10 +64,10 @@ namespace TeslaRentalCompany.API.Controllers
             int carId,
             ReservationForCreation reservation)
         {
-            var car = ReservationDataStore.Current.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
             if (car == null) { return NotFound(); }
 
-            var maxReservation = ReservationDataStore.Current.Reservations.Max(r => r.Id);
+            var maxReservation = reservationDataStore.Reservations.Max(r => r.Id);
 
             var finalReservation = new Reservation()
             {
@@ -60,7 +88,7 @@ namespace TeslaRentalCompany.API.Controllers
             int reservationId,
             ReservationForUpdating reservation)
         {
-            var car = ReservationDataStore.Current.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
             if (car == null) { return NotFound(); }
 
             var reservationToEdit = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
@@ -76,7 +104,7 @@ namespace TeslaRentalCompany.API.Controllers
             int reservationId,
             JsonPatchDocument<ReservationForUpdating> patchDocument)
         {
-            var car = ReservationDataStore.Current.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
             if (car == null) { return NotFound(); }
 
             var reservationFromStore = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
@@ -110,13 +138,14 @@ namespace TeslaRentalCompany.API.Controllers
             int carId,
             int reservationId)
         {
-            var car = ReservationDataStore.Current.Cars.FirstOrDefault(c => c.Id == carId);
+            var car = reservationDataStore.Cars.FirstOrDefault(c => c.Id == carId);
             if (car == null) { return NotFound(); }
 
             var reservationFromStore = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
             if (reservationFromStore == null) { return NotFound(); }
 
             car.ListOfReservations.Remove(reservationFromStore);
+            mailService.Send("Test Subject", "Test Message");
             return NoContent();
         }
     }
