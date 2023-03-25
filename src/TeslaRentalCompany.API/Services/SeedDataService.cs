@@ -1,4 +1,4 @@
-﻿using TeslaRentalCompany.API.Interfaces;
+﻿using TeslaRentalCompany.API.Services;
 using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.Data

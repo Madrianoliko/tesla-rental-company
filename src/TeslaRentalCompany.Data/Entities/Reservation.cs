@@ -10,6 +10,11 @@ namespace TeslaRentalCompany.Data.Entities
 {
     public class Reservation
     {
+        public Reservation()
+        {
+            Status = 1;
+            IsCanceled = false;
+        }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }

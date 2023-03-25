@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TeslaRentalCompany.Data.Models
 {
-    public class ReservationForUpdating
+    public class ReservationForUpdatingDto
     {
         [Required]
         public DateTime StartDate { get; set; }

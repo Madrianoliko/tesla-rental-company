@@ -1,6 +1,4 @@
-﻿using TeslaRentalCompany.API.Interfaces;
-
-namespace TeslaRentalCompany.API.Services
+﻿namespace TeslaRentalCompany.API.Services
 {
     public class LocalMailService : IMailService
     {

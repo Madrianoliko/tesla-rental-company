@@ -9,6 +9,9 @@ namespace TeslaRentalCompany.API.Profiles
         public ReservationProfile() 
         {
             CreateMap<Reservation, ReservationDto>();
+            CreateMap<ReservationForCreationDto, Reservation>();
+            CreateMap<ReservationForUpdatingDto, Reservation>();
+            CreateMap<Reservation, ReservationForUpdatingDto>();
         }
     }
 }

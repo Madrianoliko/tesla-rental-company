@@ -1,156 +1,190 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using TeslaRentalCompany.API.Interfaces;
-using TeslaRentalCompany.Data;
+using TeslaRentalCompany.API.Services;
+using TeslaRentalCompany.Data.Entities;
 using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/car/{carId}/reservation")]
     [ApiController]
     public class ReservationController : ControllerBase
     {
-        private readonly ILogger<ReservationController> _logger;
-        private readonly IMailService _mailService;
-        private readonly ITeslaRentalCompanyRepository _repository;
-        private readonly IMapper _mapper;
+        public ITeslaRentalCompanyRepository Repository { get; }
+        public IMapper Mapper { get; }
+        public ILogger<ReservationController> Logger { get; }
 
         public ReservationController(
-            ILogger<ReservationController> logger,
-            IMailService mailService,
             ITeslaRentalCompanyRepository repository,
-            IMapper mapper
-            )
+            IMapper mapper,
+            ILogger<ReservationController> logger)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            //seedData = seedData ?? throw new ArgumentNullException(nameof(seedData));
+            Repository = repository ??
+                throw new ArgumentNullException(nameof(repository));
+            Mapper = mapper ??
+                throw new ArgumentNullException(nameof(mapper));
+            Logger = logger ??
+                throw new ArgumentNullException(nameof(logger));
         }
-
         [HttpGet]
-        public ActionResult<IEnumerable<ReservationDto>> GetReservations()
+        public async Task<ActionResult<IEnumerable<ReservationDto>>> GetReservationsForCarAsync(int carId)
         {
-            var reservations = seedData.Reservations;
+            if (!await Repository.CarExistsAsync(carId))
+            {
+                Logger.LogInformation(
+                    $"Car with id {carId} wasn't found");
+                return NotFound();
+            }
 
-            return Ok(reservations);
+            var reservationsForCar = await Repository
+                .GetReservationsForCarAsync(carId);
+
+            return Ok(Mapper.Map<IEnumerable<ReservationDto>>(reservationsForCar));
         }
-
-
-        [HttpGet("{reservationId}")]
-        public ActionResult<ReservationDto> GetReservation(int reservationId)
+        [HttpGet("{reservationId}", Name = "GetReservationForCar")]
+        public async Task<IActionResult> GetReservationForCar(int carId, int reservationId)
         {
-            try
+            if (!await Repository.CarExistsAsync(carId))
             {
-                var reservationToReturn = seedData.Reservations.FirstOrDefault(r => r.Id == reservationId);
-
-                if (reservationToReturn == null)
-                {
-                    _logger.LogInformation("Reservation not found");
-                    return NotFound();
-                }
-
-                return Ok(reservationToReturn);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogCritical(
-                    $"Exception whlie getting reservation with id {reservationId}",
-                    ex);
-                return StatusCode(500, "A problem happend while handling your request");
+                Logger.LogInformation(
+                    $"Car with id {carId} wasn't found");
+                return NotFound();
             }
 
-
+            var reservationForCar = await Repository
+                .GetReservationForCarAsync(carId, reservationId);
+            if (reservationForCar == null)
+            {
+                return NotFound();
+            }
+            return Ok(Mapper.Map<ReservationDto>(reservationForCar));
         }
         [HttpPost]
-        public ActionResult<ReservationDto> CreateReservation(
-            int carId,
-            ReservationForCreation reservation)
+        public async Task<ActionResult<ReservationDto>> CreateReservation(
+        int carId,
+        ReservationForCreationDto reservation)
         {
-            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
-            if (car == null) { return NotFound(); }
-
-            var maxReservation = seedData.Reservations.Max(r => r.Id);
-
-            var finalReservation = new ReservationDto()
+            if (!await Repository.CarExistsAsync(carId))
             {
-                Id = ++maxReservation,
-                CarId = carId,
-                StartDate = reservation.StartDate,
-                EndDate = reservation.EndDate,
-                Status = 1,
-                IsCanceled = false
-            };
+                Logger.LogInformation(
+                    $"Car with id {carId} wasn't found");
+                return NotFound();
+            }
 
-            car.ListOfReservations.Add(finalReservation);
-            return Ok(finalReservation);
+            var finalReservation = Mapper.Map<Reservation>(reservation);
+
+            await Repository.AddReservationForCarAsync(
+                carId, finalReservation);
+
+            await Repository.SaveChangesAsync();
+
+            var createdReservationToReturn =
+                Mapper.Map<ReservationDto>(finalReservation);
+
+            return CreatedAtRoute("GetReservationForCar",
+                new
+                {
+                    carId = carId,
+                    reservationId = createdReservationToReturn.Id
+                },
+                createdReservationToReturn);
         }
-        [HttpPut("{id}")]
-        public ActionResult UpdateReservation(
+        [HttpPut("{reservationId}")]
+        public async Task<ActionResult> UpdateReservation(
             int carId,
             int reservationId,
-            ReservationForUpdating reservation)
+            ReservationForUpdatingDto reservation)
         {
-            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
-            if (car == null) { return NotFound(); }
+            if (!await Repository.CarExistsAsync(carId))
+            {
+                Logger.LogInformation(
+                    $"Car with id {carId} wasn't found");
+                return NotFound();
+            }
 
-            var reservationToEdit = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
-            if (reservationToEdit == null) { return NotFound(); }
+            var reservationEntity = await Repository
+                .GetReservationForCarAsync(carId, reservationId);
+            if (reservationEntity == null)
+            {
+                Logger.LogInformation(
+                    $"Reservation with id {reservationId} wasn't found");
+                return NotFound();
+            }
 
-            reservationToEdit.StartDate = reservation.StartDate;
-            reservationToEdit.EndDate = reservation.EndDate;
+            Mapper.Map(reservation, reservationEntity);
+
+            await Repository.SaveChangesAsync();
+
             return NoContent();
         }
         [HttpPatch("{reservationId}")]
-        public ActionResult UpdateReservation(
+        public async Task<ActionResult> PartialyUpdateReservation(
             int carId,
             int reservationId,
-            JsonPatchDocument<ReservationForUpdating> patchDocument)
+            JsonPatchDocument<ReservationForUpdatingDto> patchDocument)
         {
-            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
-            if (car == null) { return NotFound(); }
+            if (!await Repository.CarExistsAsync(carId))
+            {
+                Logger.LogInformation(
+                    $"Car with id {carId} wasn't found");
+                return NotFound();
+            }
 
-            var reservationFromStore = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
-            if (reservationFromStore == null) { return NotFound(); }
+            var reservationEntity = await Repository
+                .GetReservationForCarAsync(carId, reservationId);
+            if (reservationEntity == null)
+            {
+                Logger.LogInformation(
+                    $"Reservation with id {reservationId} wasn't found");
+                return NotFound();
+            }
 
-
-            var reservationToPatch =
-                new ReservationForUpdating()
-                {
-                    StartDate = reservationFromStore.StartDate,
-                    EndDate = reservationFromStore.EndDate
-                };
+            var reservationToPatch = Mapper.Map<ReservationForUpdatingDto>(
+                reservationEntity);
 
             patchDocument.ApplyTo(reservationToPatch, ModelState);
 
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
+
             if (!TryValidateModel(reservationToPatch))
             {
                 return BadRequest(ModelState);
             }
 
-            reservationFromStore.StartDate = reservationToPatch.StartDate;
-            reservationFromStore.EndDate = reservationToPatch.EndDate;
+            Mapper.Map(reservationToPatch, reservationEntity);
+
+            await Repository.SaveChangesAsync();
+
             return NoContent();
         }
         [HttpDelete("reservationId")]
-        public ActionResult DeleteReservation(
+        public async Task<ActionResult> DeleteReservation(
             int carId,
             int reservationId)
         {
-            var car = seedData.Cars.FirstOrDefault(c => c.Id == carId);
-            if (car == null) { return NotFound(); }
+            if (!await Repository.CarExistsAsync(carId))
+            {
+                Logger.LogInformation(
+                    $"Car with id {carId} wasn't found");
+                return NotFound();
+            }
 
-            var reservationFromStore = car.ListOfReservations.FirstOrDefault(r => r.Id == reservationId);
-            if (reservationFromStore == null) { return NotFound(); }
+            var reservationEntity = await Repository
+                .GetReservationForCarAsync(carId, reservationId);
+            if (reservationEntity == null)
+            {
+                Logger.LogInformation(
+                    $"Reservation with id {reservationId} wasn't found");
+                return NotFound();
+            }
 
-            car.ListOfReservations.Remove(reservationFromStore);
-            _mailService.Send("Test Subject", "Test Message");
+            Repository.DeleteReservationForCar(reservationEntity);
+            await Repository.SaveChangesAsync();
+
             return NoContent();
         }
     }

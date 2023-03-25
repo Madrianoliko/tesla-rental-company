@@ -1,6 +1,6 @@
 ﻿using TeslaRentalCompany.Data.Models;
 
-namespace TeslaRentalCompany.API.Interfaces
+namespace TeslaRentalCompany.API.Services
 {
     public interface ISeedDataService
     {

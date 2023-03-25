@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using TeslaRentalCompany.API;
 using TeslaRentalCompany.API.DbContexts;
-using TeslaRentalCompany.API.Interfaces;
 using TeslaRentalCompany.API.Services;
 using TeslaRentalCompany.Data;
 
