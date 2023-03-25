@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using TeslaRentalCompany.API.Interfaces;
 using TeslaRentalCompany.Data;
+using TeslaRentalCompany.Data.Entities;
 using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.API.Controllers
@@ -10,29 +13,36 @@ namespace TeslaRentalCompany.API.Controllers
     [ApiController]
     public class CarController : ControllerBase
     {
-        private readonly ISeedDataService seedData;
+        private readonly ITeslaRentalCompanyRepository _repository;
+        private readonly IMapper _mapper;
 
-        public CarController(ISeedDataService seedData)
+        public CarController(ITeslaRentalCompanyRepository repository,
+            IMapper mapper)
         {
-            this.seedData = seedData ?? throw new ArgumentNullException(nameof(seedData));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
         [HttpGet]
-        public ActionResult<List<CarDto>> GetCars ()
+        public async Task<ActionResult<IEnumerable<CarWithoutReservationsDto>>> GetCars()
         {
-            var cars = seedData.Cars;
-
-            return Ok(cars);
+            var carsEntities = await _repository.GetCarsAsync();
+            return Ok(_mapper.Map<IEnumerable<CarWithoutReservationsDto>>(carsEntities));
         }
         [HttpGet("{carId}")]
-        public ActionResult<CarDto> GetCar (int carId)
+        public async Task<IActionResult> GetCarAsync(int carId,
+            bool includeReservations = false)
         {
-            var car = seedData.Cars.FirstOrDefault(x => x.Id == carId);
-            
-            if (car == null)
+            var carEntity = await _repository.GetCarAsync(carId, includeReservations);
+            if (carEntity == null) { return NotFound(); }
+
+            if (includeReservations)
             {
-                return NotFound();
+                return Ok(_mapper.Map<CarDto>(carEntity));
             }
-            return Ok(car);
+            else
+            {
+                return Ok(_mapper.Map<CarWithoutReservationsDto>(carEntity));
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using TeslaRentalCompany.API.Interfaces;
 using TeslaRentalCompany.Data;
@@ -10,19 +11,23 @@ namespace TeslaRentalCompany.API.Controllers
     [ApiController]
     public class ReservationController : ControllerBase
     {
-        private readonly ILogger<ReservationController> logger;
-        private readonly IMailService mailService;
-        private readonly ISeedDataService seedData;
+        private readonly ILogger<ReservationController> _logger;
+        private readonly IMailService _mailService;
+        private readonly ITeslaRentalCompanyRepository _repository;
+        private readonly IMapper _mapper;
 
         public ReservationController(
             ILogger<ReservationController> logger,
             IMailService mailService,
-            ISeedDataService seedData
+            ITeslaRentalCompanyRepository repository,
+            IMapper mapper
             )
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
-            this.seedData = seedData ?? throw new ArgumentNullException(nameof(seedData));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            //seedData = seedData ?? throw new ArgumentNullException(nameof(seedData));
         }
 
         [HttpGet]
@@ -43,7 +48,7 @@ namespace TeslaRentalCompany.API.Controllers
 
                 if (reservationToReturn == null)
                 {
-                    logger.LogInformation("Reservation not found");
+                    _logger.LogInformation("Reservation not found");
                     return NotFound();
                 }
 
@@ -51,7 +56,7 @@ namespace TeslaRentalCompany.API.Controllers
             }
             catch(Exception ex)
             {
-                logger.LogCritical(
+                _logger.LogCritical(
                     $"Exception whlie getting reservation with id {reservationId}",
                     ex);
                 return StatusCode(500, "A problem happend while handling your request");
@@ -145,7 +150,7 @@ namespace TeslaRentalCompany.API.Controllers
             if (reservationFromStore == null) { return NotFound(); }
 
             car.ListOfReservations.Remove(reservationFromStore);
-            mailService.Send("Test Subject", "Test Message");
+            _mailService.Send("Test Subject", "Test Message");
             return NoContent();
         }
     }

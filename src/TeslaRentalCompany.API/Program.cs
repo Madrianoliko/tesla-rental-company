@@ -35,6 +35,10 @@ builder.Services.AddSingleton<ISeedDataService, SeedDataService>();
 builder.Services.AddDbContext<TeslaRentalCompanyContext>(
     dbContextOptions => dbContextOptions.UseSqlServer( 
         builder.Configuration["ConnectionStrings:TeslaCarCompanyConnectionString"]));
+
+builder.Services.AddScoped<ITeslaRentalCompanyRepository, TeslaRentalCompanyRepository>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     
 var app = builder.Build();
 
