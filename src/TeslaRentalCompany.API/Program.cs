@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 using TeslaRentalCompany.API;
 using TeslaRentalCompany.API.DbContexts;
 using TeslaRentalCompany.API.Services;
@@ -32,13 +34,29 @@ builder.Services.AddTransient<IMailService, LocalMailService>();
 builder.Services.AddSingleton<ISeedDataService, SeedDataService>();
 
 builder.Services.AddDbContext<TeslaRentalCompanyContext>(
-    dbContextOptions => dbContextOptions.UseSqlServer( 
+    dbContextOptions => dbContextOptions.UseSqlServer(
         builder.Configuration["ConnectionStrings:TeslaCarCompanyConnectionString"]));
 
 builder.Services.AddScoped<ITeslaRentalCompanyRepository, TeslaRentalCompanyRepository>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-    
+
+builder.Services.AddAuthentication("Bearer")
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Authentication: Issuer"],
+                ValidAudience = builder.Configuration["Authentication: Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(builder.Configuration["Authentication: SecretForKey"]))
+            };
+        }
+    );
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
