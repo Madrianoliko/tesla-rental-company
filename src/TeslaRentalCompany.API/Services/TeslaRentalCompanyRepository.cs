@@ -30,6 +30,19 @@ namespace TeslaRentalCompany.API.Services
         {
             return await Context.Cars.ToListAsync();
         }
+        public async Task<IEnumerable<Car>> GetCarsAsync(string? model)
+        {
+            if(string.IsNullOrEmpty(model))
+            {
+                return await GetCarsAsync();
+            }
+
+            model = model.Trim();
+            return await Context.Cars
+                .Where(c => c.Model == model)
+                .OrderBy(c => c.Model)
+                .ToListAsync();
+        }
         public async Task<bool> CarExistsAsync(int carId)
         {
             return await Context.Cars.AnyAsync(c => c.Id == carId);

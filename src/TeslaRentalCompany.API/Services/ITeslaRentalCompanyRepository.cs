@@ -5,6 +5,7 @@ namespace TeslaRentalCompany.API.Services
     public interface ITeslaRentalCompanyRepository
     {
         Task<IEnumerable<Car>> GetCarsAsync();
+        Task<IEnumerable<Car>> GetCarsAsync(string? model);
         Task<Car?> GetCarAsync(int carId, bool includeReservations);
         Task<IEnumerable<Reservation>> GetReservationsForCarAsync(int carId);
         Task<bool> CarExistsAsync(int carId);

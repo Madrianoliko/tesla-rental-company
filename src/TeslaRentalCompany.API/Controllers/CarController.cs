@@ -23,9 +23,10 @@ namespace TeslaRentalCompany.API.Controllers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CarWithoutReservationsDto>>> GetCars()
+        public async Task<ActionResult<IEnumerable<CarWithoutReservationsDto>>> GetCars(
+            string? model)
         {
-            var carsEntities = await _repository.GetCarsAsync();
+            var carsEntities = await _repository.GetCarsAsync(model);
             return Ok(_mapper.Map<IEnumerable<CarWithoutReservationsDto>>(carsEntities));
         }
         [HttpGet("{carId}")]
