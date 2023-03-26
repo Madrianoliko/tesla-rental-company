@@ -7,6 +7,7 @@ namespace TeslaRentalCompany.Data
     {
         public List<ReservationDto> Reservations { get; set; }
         public List<CarDto> Cars { get; set; }
+        public List<UserDto> Users { get; set; }
         //public static ReservationDataStore Current { get; } = new ReservationDataStore();
 
         public SeedDataService()
@@ -71,6 +72,21 @@ namespace TeslaRentalCompany.Data
 
                 car.ListOfReservations = Reservations.FindAll(r => r.CarId == car.Id);
             }
+            Users = new List<UserDto>
+            {
+                new UserDto("admin", "password")
+                {
+                    FirstName = "Jan",
+                    LastName = "Kowalski",
+                    IsAdmin = true,
+                },
+                new UserDto("user", "qaz123")
+                {
+                    FirstName = "Marcin",
+                    LastName = "Nowak",
+                    IsAdmin = false
+                }
+            };
         }
     }
 }

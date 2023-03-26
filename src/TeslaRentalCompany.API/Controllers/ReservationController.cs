@@ -9,7 +9,7 @@ using TeslaRentalCompany.Data.Models;
 namespace TeslaRentalCompany.API.Controllers
 {
     [Route("api/car/{carId}/reservation")]
-    [Authorize]
+    [Authorize(Policy = "MustBeAdmin")]
     [ApiController]
     public class ReservationController : ControllerBase
     {
@@ -32,6 +32,12 @@ namespace TeslaRentalCompany.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReservationDto>>> GetReservationsForCarAsync(int carId)
         {
+            //var isAdminUserClaim = User.Claims.FirstOrDefault(u => u.Type == "is_admin")?.Value;
+            //if (!await Repository.IsAuthorizedAsync(userIdClaim))
+            //{
+            //    return Forbid();
+            //}
+
             if (!await Repository.CarExistsAsync(carId))
             {
                 Logger.LogInformation(

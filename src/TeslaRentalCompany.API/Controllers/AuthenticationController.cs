@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.DataProtection.Repositories;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TeslaRentalCompany.API.Services;
+using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.API.Controllers
 {
@@ -12,38 +15,27 @@ namespace TeslaRentalCompany.API.Controllers
     public class AuthenticationController : ControllerBase
     {
         public IConfiguration Configuration { get; }
+        public ITeslaRentalCompanyRepository Repository { get; }
 
-        public class AuthenticationRequestBody
-        {
-            public string? UserName { get; set; }
-            public string? Password { get; set; }
-        }
-        private class User
-        {
-            public int UserId { get; set; }
-            public string UserName { get; set; }
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public User(int userId, string userName, string firstName, string lastName)
-            {
-                UserId = userId;
-                UserName = userName;
-                FirstName = firstName;
-                LastName = lastName;
-            }
-        }
-
-        public AuthenticationController(IConfiguration configuration)
+        public AuthenticationController(IConfiguration configuration, 
+            ITeslaRentalCompanyRepository repository)
         {
             Configuration = configuration ??
                 throw new ArgumentNullException(nameof(configuration));
+            Repository = repository ??
+                throw new ArgumentNullException(nameof(repository));
         }
 
         [HttpPost("authenticate")]
-        public ActionResult<string> Authenticate(
+        public async Task<ActionResult<string>> Authenticate(
             AuthenticationRequestBody authenticationRequestBody)
         {
-            var user = ValidateCredentials(
+            if(!await Repository.UserExistsAsync(authenticationRequestBody.UserName))
+            {
+                return NotFound();
+            }
+            
+            var user = await Repository.ValidateCredentialsAsync(
                 authenticationRequestBody.UserName,
                 authenticationRequestBody.Password);
             if (user == null) { return Unauthorized(); }
@@ -57,6 +49,7 @@ namespace TeslaRentalCompany.API.Controllers
             claimsForToken.Add(new Claim("sub", user.UserId.ToString()));
             claimsForToken.Add(new Claim("given_name", user.FirstName));
             claimsForToken.Add(new Claim("family_name", user.LastName));
+            claimsForToken.Add(new Claim("is_admin", user.IsAdmin.ToString()));
 
             var jwtSecurityToken = new JwtSecurityToken(
                 Configuration["Authentication:Issuer"],
@@ -71,16 +64,15 @@ namespace TeslaRentalCompany.API.Controllers
 
             return Ok(tokenToReturn);
         }
-
-        private User ValidateCredentials(string? userName, string? password)
+        public class AuthenticationRequestBody
         {
-            // sprawdzenie poprawnosci credensials
-            // jezeli poprawne to zwróć użytkownika
-            return new User(
-                1,
-                userName ?? "",
-                "Adrian",
-                "Malik");
+            public string UserName { get; set; }
+            public string Password { get; set; }
+            public AuthenticationRequestBody(string userName, string password)
+            {
+                UserName = userName;
+                Password = password;
+            }
         }
     }
 }

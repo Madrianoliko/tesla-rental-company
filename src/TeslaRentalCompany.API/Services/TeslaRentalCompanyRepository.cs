@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 using TeslaRentalCompany.API.DbContexts;
 using TeslaRentalCompany.Data.Entities;
+using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.API.Services
 {
@@ -22,7 +24,7 @@ namespace TeslaRentalCompany.API.Services
                     .Where(c => c.Id == carId)
                     .FirstOrDefaultAsync();
             }
-            return await Context.Cars.Include(c => c.ListOfReservations)
+            return await Context.Cars
                 .Where(c => c.Id == carId)
                 .FirstOrDefaultAsync();
         }
@@ -77,6 +79,27 @@ namespace TeslaRentalCompany.API.Services
         {
             return (await Context.SaveChangesAsync() >= 0);
         }
+        public async Task<bool> UserExistsAsync(string userName)
+        {
+            return await Context.Users.AnyAsync(u => u.UserName == userName);
+        }
+        public async Task<User?> ValidateCredentialsAsync(string userName, string password)
+        {
+            return await Context.Users
+                .Where(u => u.UserName == userName)
+                .Where(u => u.Password == password)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<bool> IsAuthorizedAsync(string userIdClaim)
+        {
+            int userId;
+            bool success = Int32.TryParse(userIdClaim, out userId);
+            if (success)
+            {
+                return await Context.Users.Where(u => u.UserId == userId).Select(u => u.IsAdmin).FirstOrDefaultAsync();
+            }
+            return false;
 
+        }
     }
 }

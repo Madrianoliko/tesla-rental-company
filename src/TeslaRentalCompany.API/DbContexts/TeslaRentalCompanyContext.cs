@@ -13,6 +13,7 @@ namespace TeslaRentalCompany.API.DbContexts
         }
         public DbSet<Car> Cars { get; set; } = null!;
         public DbSet<Reservation> Reservations { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,6 +68,22 @@ namespace TeslaRentalCompany.API.DbContexts
                     StartDate = new DateTime(2023, 3, 10, 13, 45, 0),
                     EndDate = new DateTime(2023, 3, 15, 13, 45, 0),
                     Status = 3
+                });
+            modelBuilder.Entity<User>()
+                .HasData(
+                new UserDto("admin", "password")
+                {
+                    UserId = 1,
+                    FirstName = "Jan",
+                    LastName = "Kowalski",
+                    IsAdmin = true,
+                },
+                new UserDto("user", "qaz123")
+                {
+                    UserId = 2,
+                    FirstName = "Marcin",
+                    LastName = "Nowak",
+                    IsAdmin = false
                 });
             base.OnModelCreating(modelBuilder);
         }

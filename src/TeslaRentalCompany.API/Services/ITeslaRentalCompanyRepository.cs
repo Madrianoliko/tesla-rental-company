@@ -13,6 +13,9 @@ namespace TeslaRentalCompany.API.Services
             int reservationId);
         Task AddReservationForCarAsync(int carId, Reservation reservation);
         void DeleteReservationForCar(Reservation reservation);
+        Task<bool> UserExistsAsync(string userName);
+        Task<User?> ValidateCredentialsAsync(string userName, string password);
+        Task<bool> IsAuthorizedAsync(string userIdClaim);
         Task<bool> SaveChangesAsync();
     }
 }

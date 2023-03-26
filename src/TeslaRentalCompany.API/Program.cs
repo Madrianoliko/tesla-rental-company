@@ -57,6 +57,15 @@ builder.Services.AddAuthentication("Bearer")
         }
     );
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MustBeAdmin", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("is_admin", "True");
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
