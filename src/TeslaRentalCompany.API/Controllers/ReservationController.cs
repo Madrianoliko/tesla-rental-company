@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using TeslaRentalCompany.API.Services;
@@ -8,6 +9,7 @@ using TeslaRentalCompany.Data.Models;
 namespace TeslaRentalCompany.API.Controllers
 {
     [Route("api/car/{carId}/reservation")]
+    [Authorize]
     [ApiController]
     public class ReservationController : ControllerBase
     {

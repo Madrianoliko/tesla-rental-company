@@ -59,8 +59,8 @@ namespace TeslaRentalCompany.API.Controllers
             claimsForToken.Add(new Claim("family_name", user.LastName));
 
             var jwtSecurityToken = new JwtSecurityToken(
-                Configuration["Atuhentication:Issuer"],
-                Configuration["Atuhentication:Audience"],
+                Configuration["Authentication:Issuer"],
+                Configuration["Authentication:Audience"],
                 claimsForToken,
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddHours(1),
