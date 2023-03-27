@@ -10,9 +10,14 @@ namespace TeslaRentalCompany.Data.Entities
 {
     public class User
     {
+        public User(string userName, string password)
+        {
+            UserName = userName;
+            Password = password;
+        }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int UserId { get; set; }
+        public int Id { get; set; }
         [Required]
         public string UserName { get; set; }
         [Required]
@@ -21,13 +26,8 @@ namespace TeslaRentalCompany.Data.Entities
         public string? FirstName { get; set; }
         [Required]
         public string? LastName { get; set; }
-        [Required]
-        public bool IsAdmin { get; set; }
-
-        public User(string userName, string password)
-        {
-            UserName = userName;
-            Password = password;
-        }
+        public bool IsAdmin { get; set; } = false;
+        public ICollection<Reservation> ListOfReservations { get; set; }
+            = new List<Reservation>();
     }
 }

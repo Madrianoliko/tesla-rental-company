@@ -15,53 +15,38 @@ namespace TeslaRentalCompany.API.Controllers
     {
         public ITeslaRentalCompanyRepository Repository { get; }
         public IMapper Mapper { get; }
-        public ILogger<ReservationController> Logger { get; }
 
         public ReservationController(
             ITeslaRentalCompanyRepository repository,
-            IMapper mapper,
-            ILogger<ReservationController> logger)
+            IMapper mapper)
         {
             Repository = repository ??
                 throw new ArgumentNullException(nameof(repository));
             Mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
-            Logger = logger ??
-                throw new ArgumentNullException(nameof(logger));
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReservationDto>>> GetReservationsForCarAsync(int carId)
         {
-            //var isAdminUserClaim = User.Claims.FirstOrDefault(u => u.Type == "is_admin")?.Value;
-            //if (!await Repository.IsAuthorizedAsync(userIdClaim))
-            //{
-            //    return Forbid();
-            //}
-
             if (!await Repository.CarExistsAsync(carId))
             {
-                Logger.LogInformation(
-                    $"Car with id {carId} wasn't found");
                 return NotFound();
             }
 
-            var reservationsForCar = await Repository
-                .GetReservationsForCarAsync(carId);
+            var reservationsForCar = await Repository.GetReservationsForCarAsync(carId);
 
             return Ok(Mapper.Map<IEnumerable<ReservationDto>>(reservationsForCar));
         }
         [HttpGet("{reservationId}", Name = "GetReservationForCar")]
-        public async Task<IActionResult> GetReservationForCar(int carId, int reservationId)
+        public async Task<IActionResult> GetReservationForCarAsync(int carId, int reservationId)
         {
             if (!await Repository.CarExistsAsync(carId))
             {
-                Logger.LogInformation(
-                    $"Car with id {carId} wasn't found");
                 return NotFound();
             }
 
-            var reservationForCar = await Repository
-                .GetReservationForCarAsync(carId, reservationId);
+            var reservationForCar = await Repository.GetReservationForCarAsync(carId, reservationId);
+
             if (reservationForCar == null)
             {
                 return NotFound();
@@ -69,21 +54,17 @@ namespace TeslaRentalCompany.API.Controllers
             return Ok(Mapper.Map<ReservationDto>(reservationForCar));
         }
         [HttpPost]
-        public async Task<ActionResult<ReservationDto>> CreateReservation(
-        int carId,
-        ReservationForCreationDto reservation)
+        public async Task<ActionResult<ReservationDto>> CreateReservation(int carId,
+            ReservationForCreationDto reservation)
         {
             if (!await Repository.CarExistsAsync(carId))
             {
-                Logger.LogInformation(
-                    $"Car with id {carId} wasn't found");
                 return NotFound();
             }
 
             var finalReservation = Mapper.Map<Reservation>(reservation);
 
-            await Repository.AddReservationForCarAsync(
-                carId, finalReservation);
+            await Repository.AddReservationForCarAsync(carId, finalReservation);
 
             await Repository.SaveChangesAsync();
 
@@ -106,17 +87,13 @@ namespace TeslaRentalCompany.API.Controllers
         {
             if (!await Repository.CarExistsAsync(carId))
             {
-                Logger.LogInformation(
-                    $"Car with id {carId} wasn't found");
                 return NotFound();
             }
 
-            var reservationEntity = await Repository
-                .GetReservationForCarAsync(carId, reservationId);
+            var reservationEntity = await Repository.GetReservationForCarAsync(carId, reservationId);
+
             if (reservationEntity == null)
             {
-                Logger.LogInformation(
-                    $"Reservation with id {reservationId} wasn't found");
                 return NotFound();
             }
 
@@ -126,71 +103,23 @@ namespace TeslaRentalCompany.API.Controllers
 
             return NoContent();
         }
-        [HttpPatch("{reservationId}")]
-        public async Task<ActionResult> PartialyUpdateReservation(
-            int carId,
-            int reservationId,
-            JsonPatchDocument<ReservationForUpdatingDto> patchDocument)
-        {
-            if (!await Repository.CarExistsAsync(carId))
-            {
-                Logger.LogInformation(
-                    $"Car with id {carId} wasn't found");
-                return NotFound();
-            }
-
-            var reservationEntity = await Repository
-                .GetReservationForCarAsync(carId, reservationId);
-            if (reservationEntity == null)
-            {
-                Logger.LogInformation(
-                    $"Reservation with id {reservationId} wasn't found");
-                return NotFound();
-            }
-
-            var reservationToPatch = Mapper.Map<ReservationForUpdatingDto>(
-                reservationEntity);
-
-            patchDocument.ApplyTo(reservationToPatch, ModelState);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!TryValidateModel(reservationToPatch))
-            {
-                return BadRequest(ModelState);
-            }
-
-            Mapper.Map(reservationToPatch, reservationEntity);
-
-            await Repository.SaveChangesAsync();
-
-            return NoContent();
-        }
         [HttpDelete("reservationId")]
-        public async Task<ActionResult> DeleteReservation(
-            int carId,
-            int reservationId)
+        public async Task<ActionResult> DeleteReservation(int carId, int reservationId)
         {
             if (!await Repository.CarExistsAsync(carId))
             {
-                Logger.LogInformation(
-                    $"Car with id {carId} wasn't found");
                 return NotFound();
             }
 
-            var reservationEntity = await Repository
-                .GetReservationForCarAsync(carId, reservationId);
+            var reservationEntity = await Repository.GetReservationForCarAsync(carId, reservationId);
+
             if (reservationEntity == null)
             {
-                Logger.LogInformation(
-                    $"Reservation with id {reservationId} wasn't found");
                 return NotFound();
             }
 
             Repository.DeleteReservationForCar(reservationEntity);
+
             await Repository.SaveChangesAsync();
 
             return NoContent();

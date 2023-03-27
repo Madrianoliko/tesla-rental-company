@@ -10,24 +10,28 @@ namespace TeslaRentalCompany.Data.Entities
 {
     public class Reservation
     {
-        public Reservation()
-        {
-            Status = 1;
-            IsCanceled = false;
-        }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+
         [ForeignKey("CarId")]
         public Car? Car { get; set; }
         public int CarId { get; set; }
+
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
+        public int UserId { get; set; }
+
         [Required]
         public DateTime StartDate { get; set; }
+
         [Required]
         public DateTime EndDate { get; set; }
-        public int Status { get; set; }
-        // TODO obliczanie kosztu za pomocą obliczania dni razy koszt per dzien samochodu
-        //public int Cost { get; set; }
-        public bool IsCanceled { get; set; }
+
+        public int Cost { get; set; } = 0;
+
+        public int Status { get; set; } = 1;
+
+        public bool IsCanceled { get; set; } = false;
     }
 }

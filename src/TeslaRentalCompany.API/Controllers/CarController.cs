@@ -1,16 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using TeslaRentalCompany.API.Services;
-using TeslaRentalCompany.Data;
-using TeslaRentalCompany.Data.Entities;
 using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/car")]
     [Authorize]
     [ApiController]
     public class CarController : ControllerBase

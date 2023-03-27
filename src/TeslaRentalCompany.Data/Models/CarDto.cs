@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TeslaRentalCompany.Data.Models
 {
     public class CarDto
     {
         public int Id { get; set; }
-        public string Model { get; set; }
-        public DateTime YearOfManufacture { get; set; }
+        public int CarDealershipId { get; set; }
+        public string? Model { get; set; }
+        public DateTime DateOfManufacture { get; set; }
         public int Range { get; set; }
+        public double DisperseHundreds { get; set; }
+        public int TopSpeed { get; set; }
+        public int HorsePower { get; set; }
         public int CostPerDay { get; set; }
-        public int NumberOfReservations 
+        public int NumberOfReservations
         {
             get
             {
@@ -21,8 +21,7 @@ namespace TeslaRentalCompany.Data.Models
             }
         }
 
-        public ICollection<ReservationDto> ListOfReservations { get; set; } 
-            = new List<ReservationDto>();
+        public ICollection<ReservationDto> ListOfReservations { get; set; }
+            = new HashSet<ReservationDto>();
     }
 }
-  

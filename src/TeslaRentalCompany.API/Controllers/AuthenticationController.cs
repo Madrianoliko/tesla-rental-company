@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.DataProtection.Repositories;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TeslaRentalCompany.API.Services;
-using TeslaRentalCompany.Data.Models;
 
 namespace TeslaRentalCompany.API.Controllers
 {
@@ -17,7 +14,7 @@ namespace TeslaRentalCompany.API.Controllers
         public IConfiguration Configuration { get; }
         public ITeslaRentalCompanyRepository Repository { get; }
 
-        public AuthenticationController(IConfiguration configuration, 
+        public AuthenticationController(IConfiguration configuration,
             ITeslaRentalCompanyRepository repository)
         {
             Configuration = configuration ??
@@ -30,11 +27,11 @@ namespace TeslaRentalCompany.API.Controllers
         public async Task<ActionResult<string>> Authenticate(
             AuthenticationRequestBody authenticationRequestBody)
         {
-            if(!await Repository.UserExistsAsync(authenticationRequestBody.UserName))
+            if (!await Repository.UserExistsAsync(authenticationRequestBody.UserName))
             {
                 return NotFound();
             }
-            
+
             var user = await Repository.ValidateCredentialsAsync(
                 authenticationRequestBody.UserName,
                 authenticationRequestBody.Password);
@@ -46,7 +43,7 @@ namespace TeslaRentalCompany.API.Controllers
                 securityKey, SecurityAlgorithms.HmacSha256);
 
             var claimsForToken = new List<Claim>();
-            claimsForToken.Add(new Claim("sub", user.UserId.ToString()));
+            claimsForToken.Add(new Claim("sub", user.Id.ToString()));
             claimsForToken.Add(new Claim("given_name", user.FirstName));
             claimsForToken.Add(new Claim("family_name", user.LastName));
             claimsForToken.Add(new Claim("is_admin", user.IsAdmin.ToString()));
@@ -58,7 +55,7 @@ namespace TeslaRentalCompany.API.Controllers
                 DateTime.UtcNow,
                 DateTime.UtcNow.AddHours(1),
                 signingCredentials);
-            
+
             var tokenToReturn = new JwtSecurityTokenHandler()
                 .WriteToken(jwtSecurityToken);
 

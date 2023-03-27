@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeslaRentalCompany.API.DbContexts;
 
@@ -11,9 +12,10 @@ using TeslaRentalCompany.API.DbContexts;
 namespace TeslaRentalCompany.API.Migrations
 {
     [DbContext(typeof(TeslaRentalCompanyContext))]
-    partial class TeslaRentalCompanyContextModelSnapshot : ModelSnapshot
+    [Migration("20230327203145_AppModelCompleted")]
+    partial class AppModelCompleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

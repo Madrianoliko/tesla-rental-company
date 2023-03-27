@@ -14,13 +14,13 @@ namespace TeslaRentalCompany.API.Services
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
-
-        public async Task<Car?> GetCarAsync(int carId,
-            bool includeReservations)
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CARS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55
+        public async Task<Car?> GetCarAsync(int carId, bool includeReservations)
         {
             if (includeReservations)
             {
-                return await Context.Cars.Include(c => c.ListOfReservations)
+                return await Context.Cars
+                    .Include(c => c.ListOfReservations)
                     .Where(c => c.Id == carId)
                     .FirstOrDefaultAsync();
             }
@@ -49,20 +49,21 @@ namespace TeslaRentalCompany.API.Services
         {
             return await Context.Cars.AnyAsync(c => c.Id == carId);
         }
-
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   RESERVATION  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<Reservation?> GetReservationForCarAsync(int carId, int reservationId)
         {
-            return await Context.Reservations.Where(r => r.Id == reservationId && r.CarId == carId)
+            return await Context.Reservations
+                .Where(r => r.Id == reservationId && r.CarId == carId)
                 .FirstOrDefaultAsync();
         }
         public async Task<IEnumerable<Reservation>> GetReservationsForCarAsync(int carId)
         {
             return await this.Context.Reservations
-                .Where(r => r.CarId == carId).ToListAsync();
+                .Where(r => r.CarId == carId)
+                .ToListAsync();
         }
 
-        public async Task AddReservationForCarAsync(int carId,
-            Reservation reservation)
+        public async Task AddReservationForCarAsync(int carId, Reservation reservation)
         {
             var car = await GetCarAsync(carId, false);
             if (car != null)
@@ -75,10 +76,14 @@ namespace TeslaRentalCompany.API.Services
             Context.Reservations.Remove(reservation);
         }
 
+        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  DATABASE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
         public async Task<bool> SaveChangesAsync()
         {
             return (await Context.SaveChangesAsync() >= 0);
         }
+
+        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  USER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<bool> UserExistsAsync(string userName)
         {
             return await Context.Users.AnyAsync(u => u.UserName == userName);
@@ -96,7 +101,7 @@ namespace TeslaRentalCompany.API.Services
             bool success = Int32.TryParse(userIdClaim, out userId);
             if (success)
             {
-                return await Context.Users.Where(u => u.UserId == userId).Select(u => u.IsAdmin).FirstOrDefaultAsync();
+                return await Context.Users.Where(u => u.Id == userId).Select(u => u.IsAdmin).FirstOrDefaultAsync();
             }
             return false;
 
