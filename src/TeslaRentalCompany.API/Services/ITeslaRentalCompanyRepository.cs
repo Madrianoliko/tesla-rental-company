@@ -9,7 +9,6 @@ namespace TeslaRentalCompany.API.Services
         Task<IEnumerable<Car>> GetCarsAsync();
         Task<IEnumerable<Car>> GetCarsAsync(string? model);
         Task<Car?> GetCarAsync(int carId, bool includeReservations);
-        Task<IEnumerable<Reservation>> GetReservationsForCarAsync(int carId);
         Task<bool> CarExistsAsync(int carId);
         void CreateCar(Car car);
         void DeleteCar(Car car);
@@ -22,10 +21,10 @@ namespace TeslaRentalCompany.API.Services
         void DeleteCarDealership(CarDealership carDealership);
 
         //Rervation Methods
-        Task<Reservation?> GetReservationForCarAsync(int carId,
-            int reservationId);
-        Task AddReservationForCarAsync(int carId, Reservation reservation);
-        void DeleteReservationForCar(Reservation reservation);
+        Task<Reservation?> GetReservationAsync(int reservationId);
+        Task<IEnumerable<Reservation>> GetReservationsAsync();
+        Task AddReservationAsync(int carId, int userId, Reservation reservation);
+        void DeleteReservation(Reservation reservation);
 
         //User Methods
         Task<bool> UserExistsAsync(string userName);

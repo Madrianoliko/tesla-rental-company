@@ -28,26 +28,16 @@ namespace TeslaRentalCompany.API.Controllers
         public IMapper Mapper { get; }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReservationDto>>> GetReservationsForCarAsync(int carId)
+        public async Task<ActionResult<IEnumerable<ReservationDto>>> GetReservationsAsync()
         {
-            if (!await Repository.CarExistsAsync(carId))
-            {
-                return NotFound();
-            }
+            var reservationEntities = await Repository.GetReservationsAsync();
 
-            var reservationsForCar = await Repository.GetReservationsForCarAsync(carId);
-
-            return Ok(Mapper.Map<IEnumerable<ReservationDto>>(reservationsForCar));
+            return Ok(Mapper.Map<IEnumerable<ReservationDto>>(reservationEntities));
         }
-        [HttpGet("{reservationId}", Name = "GetReservationForCar")]
-        public async Task<IActionResult> GetReservationForCarAsync(int carId, int reservationId)
+        [HttpGet("{reservationId}", Name = "GetReservation")]
+        public async Task<IActionResult> GetReservationAsync(int reservationId)
         {
-            if (!await Repository.CarExistsAsync(carId))
-            {
-                return NotFound();
-            }
-
-            var reservationForCar = await Repository.GetReservationForCarAsync(carId, reservationId);
+            var reservationForCar = await Repository.GetReservationAsync(reservationId);
 
             if (reservationForCar == null)
             {
@@ -57,27 +47,32 @@ namespace TeslaRentalCompany.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ReservationDto>> CreateReservation(int carId,
+        public async Task<ActionResult<ReservationDto>> CreateReservation(int carId, int userId,
             ReservationForCreationDto reservation)
         {
             if (!await Repository.CarExistsAsync(carId))
             {
                 return NotFound();
             }
+            if (!await Repository.UserExistsAsync(userId))
+            {
+                return NotFound();
+            }
 
             var finalReservation = Mapper.Map<Reservation>(reservation);
 
-            await Repository.AddReservationForCarAsync(carId, finalReservation);
+            await Repository.AddReservationAsync(carId, userId, finalReservation);
 
             await Repository.SaveChangesAsync();
 
             var createdReservationToReturn =
                 Mapper.Map<ReservationDto>(finalReservation);
 
-            return CreatedAtRoute("GetReservationForCar",
+            return CreatedAtRoute("GetReservation",
                 new
                 {
                     carId = carId,
+                    userId = userId,
                     reservationId = createdReservationToReturn.Id
                 },
                 createdReservationToReturn);
@@ -85,16 +80,10 @@ namespace TeslaRentalCompany.API.Controllers
 
         [HttpPut("{reservationId}")]
         public async Task<ActionResult> UpdateReservation(
-            int carId,
             int reservationId,
             ReservationForUpdatingDto reservation)
         {
-            if (!await Repository.CarExistsAsync(carId))
-            {
-                return NotFound();
-            }
-
-            var reservationEntity = await Repository.GetReservationForCarAsync(carId, reservationId);
+            var reservationEntity = await Repository.GetReservationAsync(reservationId);
 
             if (reservationEntity == null)
             {
@@ -108,21 +97,16 @@ namespace TeslaRentalCompany.API.Controllers
             return NoContent();
         }
         [HttpDelete("{reservationId}")]
-        public async Task<ActionResult> DeleteReservation(int carId, int reservationId)
+        public async Task<ActionResult> DeleteReservation(int reservationId)
         {
-            if (!await Repository.CarExistsAsync(carId))
-            {
-                return NotFound();
-            }
-
-            var reservationEntity = await Repository.GetReservationForCarAsync(carId, reservationId);
+            var reservationEntity = await Repository.GetReservationAsync(reservationId);
 
             if (reservationEntity == null)
             {
                 return NotFound();
             }
 
-            Repository.DeleteReservationForCar(reservationEntity);
+            Repository.DeleteReservation(reservationEntity);
 
             await Repository.SaveChangesAsync();
 

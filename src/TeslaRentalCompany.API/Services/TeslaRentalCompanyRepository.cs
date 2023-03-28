@@ -100,30 +100,34 @@ namespace TeslaRentalCompany.API.Services
         }
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RESERVATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        public async Task<Reservation?> GetReservationForCarAsync(int carId, int reservationId)
+        public async Task<IEnumerable<Reservation>> GetReservationsAsync()
+        {
+            return await this.Context.Reservations.ToListAsync();
+        }
+
+        public async Task<Reservation?> GetReservationAsync(int reservationId)
         {
             return await Context.Reservations
-                .Where(r => r.Id == reservationId && r.CarId == carId)
+                .Where(r => r.Id == reservationId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Reservation>> GetReservationsForCarAsync(int carId)
-        {
-            return await this.Context.Reservations
-                .Where(r => r.CarId == carId)
-                .ToListAsync();
-        }
-
-        public async Task AddReservationForCarAsync(int carId, Reservation reservation)
+        public async Task AddReservationAsync(int carId, int userId, Reservation reservation)
         {
             var car = await GetCarAsync(carId, false);
             if (car != null)
             {
                 car.ListOfReservations.Add(reservation);
             }
+            var user = await GetUserAsync(userId, false);
+            if (user != null)
+            {
+                user.ListOfReservations.Add(reservation);
+            }
+            Context.Reservations.Add(reservation);
         }
 
-        public void DeleteReservationForCar(Reservation reservation)
+        public void DeleteReservation(Reservation reservation)
         {
             Context.Reservations.Remove(reservation);
         }

@@ -24,7 +24,7 @@ namespace TeslaRentalCompany.API.Controllers
         public async Task<ActionResult<IEnumerable<CarDealershipWithoutCarsDto>>> GetCarDealershipsAsync()
         {
             var carDealershipEntities = await Repository.GetCarDealershipsAsync();
-            return Ok(Mapper.Map<IEnumerable<UserWithoutReservationsDto>>(carDealershipEntities));
+            return Ok(Mapper.Map<IEnumerable<CarDealershipWithoutCarsDto>>(carDealershipEntities));
         }
 
         [HttpGet("{carDealershipId}", Name = "GetCarDealership")]
