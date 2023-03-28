@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TeslaRentalCompany.API.Services;
+using TeslaRentalCompany.API.Entities;
 using TeslaRentalCompany.API.Models;
+using TeslaRentalCompany.API.Services;
 
 namespace TeslaRentalCompany.API.Controllers
 {
@@ -11,37 +11,71 @@ namespace TeslaRentalCompany.API.Controllers
     [ApiController]
     public class CarController : ControllerBase
     {
-        private readonly ITeslaRentalCompanyRepository _repository;
-        private readonly IMapper _mapper;
-
         public CarController(ITeslaRentalCompanyRepository repository,
             IMapper mapper)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            Repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
+
+        private ITeslaRentalCompanyRepository Repository { get; set; }
+        private IMapper Mapper { get; set; }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CarWithoutReservationsDto>>> GetCars(
             string? model)
         {
-            var carsEntities = await _repository.GetCarsAsync(model);
-            return Ok(_mapper.Map<IEnumerable<CarWithoutReservationsDto>>(carsEntities));
+            var carsEntities = await Repository.GetCarsAsync(model);
+            return Ok(Mapper.Map<IEnumerable<CarWithoutReservationsDto>>(carsEntities));
         }
-        [HttpGet("{carId}")]
+
+        [HttpGet("{carId}", Name = "GetCar")]
         public async Task<IActionResult> GetCarAsync(int carId,
             bool includeReservations = false)
         {
-            var carEntity = await _repository.GetCarAsync(carId, includeReservations);
+            var carEntity = await Repository.GetCarAsync(carId, includeReservations);
             if (carEntity == null) { return NotFound(); }
 
             if (includeReservations)
             {
-                return Ok(_mapper.Map<CarDto>(carEntity));
+                return Ok(Mapper.Map<CarDto>(carEntity));
             }
             else
             {
-                return Ok(_mapper.Map<CarWithoutReservationsDto>(carEntity));
+                return Ok(Mapper.Map<CarWithoutReservationsDto>(carEntity));
             }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<CarDto>> CreateCarAsync(CarForCreationDto car)
+        {
+            var finalCar = Mapper.Map<Car>(car);
+
+            Repository.CreateCar(finalCar);
+
+            await Repository.SaveChangesAsync();
+
+            var createdCarToReturn = Mapper.Map<CarDto>(car);
+
+            return CreatedAtRoute("GetCar",
+                new
+                {
+                    carId = createdCarToReturn.Id
+                },
+                createdCarToReturn);
+        }
+
+        [HttpPut("carId")]
+        public async Task<ActionResult<CarDto>> UpdateCarAsync(int carId, CarForUpdatingDto car)
+        {
+            var carEntity = await Repository.GetCarAsync(carId, false);
+            if (carEntity == null) { return NotFound(); }
+
+            Mapper.Map(car, carEntity);
+
+            await Repository.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

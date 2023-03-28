@@ -55,38 +55,17 @@ namespace TeslaRentalCompany.API.Controllers
                 },
                 createdUserToReturn);
         }
-        //TODO
         [HttpPut("userId")]
         public async Task<ActionResult<UserDto>> UpdateUserAsync(int userId, UserForUpdatingDto user)
         {
-            if (!await Repository.UserExistsAsync(userId))
-            {
-                return NotFound();
-            }
+            var userEntity = await Repository.GetUserAsync(userId);
+            if (userEntity == null) { return NotFound();  }
+
+            Mapper.Map(user, userEntity);
+
+            await Repository.SaveChangesAsync();
+
             return NoContent();
         }
-        //public async Task<ActionResult> UpdateReservation(
-        //    int carId,
-        //    int reservationId,
-        //    ReservationForUpdatingDto reservation)
-        //{
-        //    if (!await Repository.CarExistsAsync(carId))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var reservationEntity = await Repository.GetReservationForCarAsync(carId, reservationId);
-
-        //    if (reservationEntity == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    Mapper.Map(reservation, reservationEntity);
-
-        //    await Repository.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
     }
 }

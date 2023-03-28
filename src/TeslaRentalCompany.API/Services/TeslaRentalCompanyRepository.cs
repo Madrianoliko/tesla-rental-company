@@ -53,6 +53,10 @@ namespace TeslaRentalCompany.API.Services
         {
             return await Context.Cars.AnyAsync(c => c.Id == carId);
         }
+        public void CreateCar(Car car)
+        {
+            Context.Cars.Add(car);
+        }
 
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   RESERVATION  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<Reservation?> GetReservationForCarAsync(int carId, int reservationId)
@@ -104,7 +108,7 @@ namespace TeslaRentalCompany.API.Services
                 .Where(u => u.Id == userId)
                 .FirstOrDefaultAsync();
         }
-        public void CreateUserAsync(User user)
+        public void CreateUser(User user)
         {
             Context.Users.Add(user);
         }
