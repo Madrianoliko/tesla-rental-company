@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TeslaRentalCompany.API.DbContexts;
 using TeslaRentalCompany.API.Entities;
+using TeslaRentalCompany.API.Models;
 
 namespace TeslaRentalCompany.API.Services
 {
@@ -12,6 +14,7 @@ namespace TeslaRentalCompany.API.Services
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
+
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CARS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55
         public async Task<Car?> GetCarAsync(int carId, bool includeReservations)
         {
@@ -26,10 +29,12 @@ namespace TeslaRentalCompany.API.Services
                 .Where(c => c.Id == carId)
                 .FirstOrDefaultAsync();
         }
+
         public async Task<IEnumerable<Car>> GetCarsAsync()
         {
             return await Context.Cars.ToListAsync();
         }
+
         public async Task<IEnumerable<Car>> GetCarsAsync(string? model)
         {
             if (string.IsNullOrEmpty(model))
@@ -43,10 +48,12 @@ namespace TeslaRentalCompany.API.Services
                 .OrderBy(c => c.Model)
                 .ToListAsync();
         }
+
         public async Task<bool> CarExistsAsync(int carId)
         {
             return await Context.Cars.AnyAsync(c => c.Id == carId);
         }
+
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   RESERVATION  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<Reservation?> GetReservationForCarAsync(int carId, int reservationId)
         {
@@ -54,6 +61,7 @@ namespace TeslaRentalCompany.API.Services
                 .Where(r => r.Id == reservationId && r.CarId == carId)
                 .FirstOrDefaultAsync();
         }
+
         public async Task<IEnumerable<Reservation>> GetReservationsForCarAsync(int carId)
         {
             return await this.Context.Reservations
@@ -69,9 +77,36 @@ namespace TeslaRentalCompany.API.Services
                 car.ListOfReservations.Add(reservation);
             }
         }
+
         public void DeleteReservationForCar(Reservation reservation)
         {
             Context.Reservations.Remove(reservation);
+        }
+
+        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  USER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        public async Task<bool> UserExistsAsync(string userName)
+        {
+            return await Context.Users.AnyAsync(u => u.UserName == userName);
+        }
+        public async Task<bool> UserExistsAsync(int userId)
+        {
+            return await Context.Users.AnyAsync(u => u.Id == userId);
+        }
+
+        public async Task<IEnumerable<User>> GetUsersAsync()
+        {
+            return await Context.Users.ToListAsync();
+        }
+        public async Task<User?> GetUserAsync(int userId)
+        {
+            return await Context.Users
+                .Include(u => u.ListOfReservations)
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+        }
+        public void CreateUserAsync(User user)
+        {
+            Context.Users.Add(user);
         }
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  DATABASE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,11 +116,7 @@ namespace TeslaRentalCompany.API.Services
             return (await Context.SaveChangesAsync() >= 0);
         }
 
-        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  USER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        public async Task<bool> UserExistsAsync(string userName)
-        {
-            return await Context.Users.AnyAsync(u => u.UserName == userName);
-        }
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ADITIONAL METHODS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<User?> ValidateCredentialsAsync(string userName, string password)
         {
             return await Context.Users
@@ -93,6 +124,7 @@ namespace TeslaRentalCompany.API.Services
                 .Where(u => u.Password == password)
                 .FirstOrDefaultAsync();
         }
+
         public async Task<bool> IsAuthorizedAsync(string userIdClaim)
         {
             int userId;
@@ -102,7 +134,7 @@ namespace TeslaRentalCompany.API.Services
                 return await Context.Users.Where(u => u.Id == userId).Select(u => u.IsAdmin).FirstOrDefaultAsync();
             }
             return false;
-
         }
+
     }
 }

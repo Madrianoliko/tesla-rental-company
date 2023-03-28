@@ -9,12 +9,10 @@ using TeslaRentalCompany.API.Models;
 namespace TeslaRentalCompany.API.Controllers
 {
     [Route("api/car/{carId}/reservation")]
-    [Authorize(Policy = "MustBeAdmin")]
+    //[Authorize(Policy = "MustBeAdmin")]
     [ApiController]
     public class ReservationController : ControllerBase
     {
-        public ITeslaRentalCompanyRepository Repository { get; }
-        public IMapper Mapper { get; }
 
         public ReservationController(
             ITeslaRentalCompanyRepository repository,
@@ -25,6 +23,10 @@ namespace TeslaRentalCompany.API.Controllers
             Mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
         }
+
+        public ITeslaRentalCompanyRepository Repository { get; }
+        public IMapper Mapper { get; }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReservationDto>>> GetReservationsForCarAsync(int carId)
         {
@@ -53,6 +55,7 @@ namespace TeslaRentalCompany.API.Controllers
             }
             return Ok(Mapper.Map<ReservationDto>(reservationForCar));
         }
+        //TODO przypisanie do użytkownika
         [HttpPost]
         public async Task<ActionResult<ReservationDto>> CreateReservation(int carId,
             ReservationForCreationDto reservation)

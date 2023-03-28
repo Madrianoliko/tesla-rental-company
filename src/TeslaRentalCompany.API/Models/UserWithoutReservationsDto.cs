@@ -1,21 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TeslaRentalCompany.API.Models
+﻿namespace TeslaRentalCompany.API.Models
 {
-    public class UserForCreationDto
+    public class UserWithoutReservationsDto
     {
-
-        public UserForCreationDto(string userName, string password)
+        public UserWithoutReservationsDto(string userName, string password)
         {
             UserName = userName;
             Password = password;
+            IsAdmin = false;
         }
 
-        [Required]
+        public int Id { get; set; }
         public string UserName { get; set; }
-        [Required]
         public string Password { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

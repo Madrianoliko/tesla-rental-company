@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TeslaRentalCompany.API.Entities
 {
@@ -14,6 +9,7 @@ namespace TeslaRentalCompany.API.Entities
         {
             UserName = userName;
             Password = password;
+            IsAdmin = false;
         }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,8 +22,8 @@ namespace TeslaRentalCompany.API.Entities
         public string? FirstName { get; set; }
         [Required]
         public string? LastName { get; set; }
-        public bool IsAdmin { get; set; } = false;
-        public ICollection<Reservation> ListOfReservations { get; set; }
-            = new List<Reservation>();
+        public bool IsAdmin { get; set; }
+        public ICollection<Reservation> ListOfReservations { get; set; } = new List<Reservation>();
+
     }
 }

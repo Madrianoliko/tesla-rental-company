@@ -11,9 +11,6 @@ namespace TeslaRentalCompany.API.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        public IConfiguration Configuration { get; }
-        public ITeslaRentalCompanyRepository Repository { get; }
-
         public AuthenticationController(IConfiguration configuration,
             ITeslaRentalCompanyRepository repository)
         {
@@ -22,6 +19,9 @@ namespace TeslaRentalCompany.API.Controllers
             Repository = repository ??
                 throw new ArgumentNullException(nameof(repository));
         }
+
+        public IConfiguration Configuration { get; }
+        public ITeslaRentalCompanyRepository Repository { get; }
 
         [HttpPost("authenticate")]
         public async Task<ActionResult<string>> Authenticate(

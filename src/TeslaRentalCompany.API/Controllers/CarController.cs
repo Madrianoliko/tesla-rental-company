@@ -7,7 +7,7 @@ using TeslaRentalCompany.API.Models;
 namespace TeslaRentalCompany.API.Controllers
 {
     [Route("api/car")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class CarController : ControllerBase
     {
