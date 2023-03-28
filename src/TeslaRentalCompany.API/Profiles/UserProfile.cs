@@ -12,6 +12,7 @@ namespace TeslaRentalCompany.API.Profiles
             CreateMap<User, UserWithoutReservationsDto>();
             CreateMap<UserDto, User>();
             CreateMap<UserForCreationDto, User>();
+            CreateMap<UserForUpdatingDto, User>();
         }
     }
 }

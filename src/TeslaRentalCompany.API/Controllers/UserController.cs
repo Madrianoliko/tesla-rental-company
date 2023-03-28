@@ -69,6 +69,12 @@ namespace TeslaRentalCompany.API.Controllers
             var userEntity = await Repository.GetUserAsync(userId, false);
             if (userEntity == null) { return NotFound();  }
 
+            var editedUser = await Repository.GetUserAsync(user.UserName);
+            if (editedUser != null) 
+            {
+                if (editedUser.Id != userEntity.Id) { return BadRequest(); }
+            }
+
             Mapper.Map(user, userEntity);
 
             await Repository.SaveChangesAsync();

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 using TeslaRentalCompany.API.DbContexts;
 using TeslaRentalCompany.API.Entities;
 using TeslaRentalCompany.API.Models;
@@ -53,8 +54,13 @@ namespace TeslaRentalCompany.API.Services
         {
             return await Context.Cars.AnyAsync(c => c.Id == carId);
         }
-        public void CreateCar(Car car)
+        public async Task CreateCarAsync(Car car, int carDealershipId)
         {
+            var carDealership = await GetCarDealershipAsync(carDealershipId, false);
+            if (carDealership != null)
+            {
+                carDealership.ListOfCars.Add(car);
+            }
             Context.Cars.Add(car);
         }
         public void DeleteCar(Car car)
@@ -67,7 +73,10 @@ namespace TeslaRentalCompany.API.Services
         {
             return await Context.CarDealerships.AnyAsync(cd => cd.Localization == localization);
         }
-
+        public async Task<bool> CarDealershipExistsAsync(int carDealershipId)
+        {
+            return await Context.CarDealerships.AnyAsync(cd => cd.Id == carDealershipId);
+        }
         public async Task<IEnumerable<CarDealership>> GetCarDealershipsAsync()
         {
             return await Context.CarDealerships.ToListAsync();
@@ -141,10 +150,13 @@ namespace TeslaRentalCompany.API.Services
         {
             return await Context.Users.AnyAsync(u => u.Id == userId);
         }
-
         public async Task<IEnumerable<User>> GetUsersAsync()
         {
             return await Context.Users.ToListAsync();
+        }
+        public async Task<User?> GetUserAsync(string userName)
+        {
+            return await Context.Users.Where(u => u.UserName == userName).FirstOrDefaultAsync();
         }
 
         public async Task<User?> GetUserAsync(int userId, bool includeReservations)

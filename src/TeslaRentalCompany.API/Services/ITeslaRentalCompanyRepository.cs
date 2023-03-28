@@ -10,11 +10,12 @@ namespace TeslaRentalCompany.API.Services
         Task<IEnumerable<Car>> GetCarsAsync(string? model);
         Task<Car?> GetCarAsync(int carId, bool includeReservations);
         Task<bool> CarExistsAsync(int carId);
-        void CreateCar(Car car);
+        Task CreateCarAsync(Car car, int carDealershipId);
         void DeleteCar(Car car);
 
         //Car Dealership Methods
         Task<bool> CarDealershipExistsAsync(string localization);
+        Task<bool> CarDealershipExistsAsync(int carDealershipId);
         Task<IEnumerable<CarDealership>> GetCarDealershipsAsync();
         Task<CarDealership?> GetCarDealershipAsync(int carDealershipId, bool includeCars);
         void CreateCarDealership(CarDealership carDealership);
@@ -30,6 +31,7 @@ namespace TeslaRentalCompany.API.Services
         Task<bool> UserExistsAsync(string userName);
         Task<bool> UserExistsAsync(int userId);
         Task<IEnumerable<User>> GetUsersAsync();
+        Task<User?> GetUserAsync(string userName);
         Task<User?> GetUserAsync(int userId, bool includeReservations);
         void CreateUser(User user);
         void DeleteUser(User user);

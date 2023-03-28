@@ -1,4 +1,9 @@
-﻿namespace TeslaRentalCompany.API.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using TeslaRentalCompany.API.Entities;
+using System.Collections.Generic;
+
+namespace TeslaRentalCompany.API.Models
 {
     public class CarDto
     {

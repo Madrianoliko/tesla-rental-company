@@ -8,8 +8,6 @@ namespace TeslaRentalCompany.API.Models
         [MaxLength(100)]
         public string? Model { get; set; }
         [Required]
-        public int CarDealershipId { get; set; }
-        [Required]
         public DateTime DateOfManufacture { get; set; }
         [Required]
         public int Range { get; set; }

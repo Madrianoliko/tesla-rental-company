@@ -1,4 +1,6 @@
-﻿using TeslaRentalCompany.API.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using TeslaRentalCompany.API.Entities;
 
 namespace TeslaRentalCompany.API.Models
 {
@@ -6,6 +8,7 @@ namespace TeslaRentalCompany.API.Models
     {
         public int Id { get; set; }
         public string? Localization { get; set; }
-        public ICollection<Car> ListOfCars { get; set; } = new List<Car>();
+        public ICollection<CarDto> ListOfCars { get; set; } 
+            = new HashSet<CarDto>();
     }
 }

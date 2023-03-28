@@ -12,6 +12,8 @@ namespace TeslaRentalCompany.API.Profiles
             CreateMap<CarDealership, CarDealershipDto>();
             CreateMap<CarDealershipDto, CarDealership>();
             CreateMap<CarDealershipForCreationDto, CarDealership>();
+            CreateMap<CarDealershipForCreationDto, CarDealershipDto>();
+            CreateMap<CarDealershipForUpdatingDto, CarDealership>();
         }
     }
 }

@@ -47,11 +47,13 @@ namespace TeslaRentalCompany.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CarDto>> CreateCarAsync(CarForCreationDto car)
+        public async Task<ActionResult<CarDto>> CreateCarAsync(int carDealershipId, CarForCreationDto car)
         {
+            if(!await Repository.CarDealershipExistsAsync(carDealershipId)) { return NotFound(); }
+
             var finalCar = Mapper.Map<Car>(car);
 
-            Repository.CreateCar(finalCar);
+            Repository.CreateCarAsync(finalCar, carDealershipId);
 
             await Repository.SaveChangesAsync();
 
