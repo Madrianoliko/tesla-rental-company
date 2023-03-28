@@ -27,12 +27,20 @@ namespace TeslaRentalCompany.API.Controllers
         }
 
         [HttpGet("{userId}", Name = "GetUser")]
-        public async Task<ActionResult<UserDto>> GetUserAsync(int userId)
+        public async Task<ActionResult<UserDto>> GetUserAsync(int userId,
+            bool includeReservations = false)
         {
-            var user = await Repository.GetUserAsync(userId);
-            if (user == null) { return NotFound(); }
+            var userEntity = await Repository.GetUserAsync(userId, includeReservations);
+            if (userEntity == null) { return NotFound(); }
 
-            return Ok(Mapper.Map<UserDto>(user));
+            if (includeReservations)
+            {
+                return Ok(Mapper.Map<UserDto>(userEntity));
+            }
+            else
+            {
+                return Ok(Mapper.Map<UserWithoutReservationsDto>(userEntity));
+            }
         }
 
         [HttpPost]
@@ -42,7 +50,7 @@ namespace TeslaRentalCompany.API.Controllers
 
             var finalUser = Mapper.Map<User>(user);
 
-            Repository.CreateUserAsync(finalUser);
+            Repository.CreateUser(finalUser);
 
             await Repository.SaveChangesAsync();
 
@@ -55,13 +63,25 @@ namespace TeslaRentalCompany.API.Controllers
                 },
                 createdUserToReturn);
         }
-        [HttpPut("userId")]
+        [HttpPut("{userId}")]
         public async Task<ActionResult<UserDto>> UpdateUserAsync(int userId, UserForUpdatingDto user)
         {
-            var userEntity = await Repository.GetUserAsync(userId);
+            var userEntity = await Repository.GetUserAsync(userId, false);
             if (userEntity == null) { return NotFound();  }
 
             Mapper.Map(user, userEntity);
+
+            await Repository.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpDelete("{userId}")]
+        public async Task<ActionResult> DeleteUser(int userId)
+        {
+            var userEntity = await Repository.GetUserAsync(userId, false);
+            if (userEntity == null) { return NotFound(); }
+
+            Repository.DeleteUser(userEntity);
 
             await Repository.SaveChangesAsync();
 

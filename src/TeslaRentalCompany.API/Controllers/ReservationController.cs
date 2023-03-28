@@ -8,7 +8,7 @@ using TeslaRentalCompany.API.Models;
 
 namespace TeslaRentalCompany.API.Controllers
 {
-    [Route("api/car/{carId}/reservation")]
+    [Route("api/reservation")]
     //[Authorize(Policy = "MustBeAdmin")]
     [ApiController]
     public class ReservationController : ControllerBase
@@ -55,7 +55,7 @@ namespace TeslaRentalCompany.API.Controllers
             }
             return Ok(Mapper.Map<ReservationDto>(reservationForCar));
         }
-        //TODO przypisanie do użytkownika
+
         [HttpPost]
         public async Task<ActionResult<ReservationDto>> CreateReservation(int carId,
             ReservationForCreationDto reservation)
@@ -82,6 +82,7 @@ namespace TeslaRentalCompany.API.Controllers
                 },
                 createdReservationToReturn);
         }
+
         [HttpPut("{reservationId}")]
         public async Task<ActionResult> UpdateReservation(
             int carId,
@@ -106,7 +107,7 @@ namespace TeslaRentalCompany.API.Controllers
 
             return NoContent();
         }
-        [HttpDelete("reservationId")]
+        [HttpDelete("{reservationId}")]
         public async Task<ActionResult> DeleteReservation(int carId, int reservationId)
         {
             if (!await Repository.CarExistsAsync(carId))

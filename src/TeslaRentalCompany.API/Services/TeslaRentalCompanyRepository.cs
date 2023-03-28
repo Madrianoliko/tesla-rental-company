@@ -15,7 +15,7 @@ namespace TeslaRentalCompany.API.Services
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CARS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CARS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<Car?> GetCarAsync(int carId, bool includeReservations)
         {
             if (includeReservations)
@@ -57,8 +57,49 @@ namespace TeslaRentalCompany.API.Services
         {
             Context.Cars.Add(car);
         }
+        public void DeleteCar(Car car)
+        {
+            Context.Cars.Remove(car);
+        }
 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   RESERVATION  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CAR DEALERSHIP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        public async Task<bool> CarDealershipExistsAsync(string localization)
+        {
+            return await Context.CarDealerships.AnyAsync(cd => cd.Localization == localization);
+        }
+
+        public async Task<IEnumerable<CarDealership>> GetCarDealershipsAsync()
+        {
+            return await Context.CarDealerships.ToListAsync();
+        }
+
+        public async Task<CarDealership?> GetCarDealershipAsync(int carDealershipId, bool includeCars)
+        {
+            if (includeCars)
+            {
+                return await Context.CarDealerships
+                    .Include(cd => cd.ListOfCars)
+                    .Where(cd => cd.Id == carDealershipId)
+                    .FirstOrDefaultAsync();
+            }
+            else
+            {
+                return await Context.CarDealerships
+                .Where(cd => cd.Id == carDealershipId)
+                .FirstOrDefaultAsync();
+            }
+        }
+
+        public void CreateCarDealership(CarDealership carDealership)
+        {
+            Context.CarDealerships.Add(carDealership);
+        }
+        public void DeleteCarDealership(CarDealership carDealership)
+        {
+            Context.CarDealerships.Remove(carDealership);
+        }
+
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RESERVATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<Reservation?> GetReservationForCarAsync(int carId, int reservationId)
         {
             return await Context.Reservations
@@ -87,7 +128,7 @@ namespace TeslaRentalCompany.API.Services
             Context.Reservations.Remove(reservation);
         }
 
-        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  USER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% USER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<bool> UserExistsAsync(string userName)
         {
             return await Context.Users.AnyAsync(u => u.UserName == userName);
@@ -101,26 +142,40 @@ namespace TeslaRentalCompany.API.Services
         {
             return await Context.Users.ToListAsync();
         }
-        public async Task<User?> GetUserAsync(int userId)
+
+        public async Task<User?> GetUserAsync(int userId, bool includeReservations)
         {
-            return await Context.Users
-                .Include(u => u.ListOfReservations)
+            if (includeReservations)
+            {
+                return await Context.Users
+                    .Include(u => u.ListOfReservations)
+                    .Where(u => u.Id == userId)
+                    .FirstOrDefaultAsync();
+            }
+            else
+            {
+                return await Context.Users
                 .Where(u => u.Id == userId)
                 .FirstOrDefaultAsync();
+            }
         }
         public void CreateUser(User user)
         {
             Context.Users.Add(user);
         }
+        public void DeleteUser(User user)
+        {
+            Context.Users.Remove(user);
+        }
 
-        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  DATABASE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DATABASE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         public async Task<bool> SaveChangesAsync()
         {
             return (await Context.SaveChangesAsync() >= 0);
         }
 
-        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ADITIONAL METHODS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ADDITIONAL METHODS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         public async Task<User?> ValidateCredentialsAsync(string userName, string password)
         {
             return await Context.Users
@@ -139,6 +194,7 @@ namespace TeslaRentalCompany.API.Services
             }
             return false;
         }
+
 
     }
 }

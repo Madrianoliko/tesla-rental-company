@@ -10,5 +10,7 @@ namespace TeslaRentalCompany.API.Entities
         public int Id { get; set; }
         [Required]
         public string? Localization { get; set; }
+
+        public ICollection<Car> ListOfCars { get; set; } = new List<Car>();
     }
 }

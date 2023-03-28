@@ -65,13 +65,25 @@ namespace TeslaRentalCompany.API.Controllers
                 createdCarToReturn);
         }
 
-        [HttpPut("carId")]
+        [HttpPut("{carId}")]
         public async Task<ActionResult<CarDto>> UpdateCarAsync(int carId, CarForUpdatingDto car)
         {
             var carEntity = await Repository.GetCarAsync(carId, false);
             if (carEntity == null) { return NotFound(); }
 
             Mapper.Map(car, carEntity);
+
+            await Repository.SaveChangesAsync();
+
+            return NoContent();
+        }
+        [HttpDelete("{carId}")]
+        public async Task<ActionResult> DeleteCar(int carId)
+        {
+            var carEntity = await Repository.GetCarAsync(carId, false);
+            if (carEntity == null) { return NotFound() ; }
+
+            Repository.DeleteCar(carEntity);
 
             await Repository.SaveChangesAsync();
 
