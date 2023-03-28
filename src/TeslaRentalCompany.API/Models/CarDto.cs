@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TeslaRentalCompany.Data.Models
+﻿namespace TeslaRentalCompany.API.Models
 {
     public class CarDto
     {

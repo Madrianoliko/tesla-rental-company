@@ -1,4 +1,4 @@
-﻿using TeslaRentalCompany.Data.Entities;
+﻿using TeslaRentalCompany.API.Entities;
 
 namespace TeslaRentalCompany.API.Services
 {

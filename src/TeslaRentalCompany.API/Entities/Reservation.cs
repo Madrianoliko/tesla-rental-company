@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TeslaRentalCompany.Data.Entities
+namespace TeslaRentalCompany.API.Entities
 {
     public class Reservation
     {

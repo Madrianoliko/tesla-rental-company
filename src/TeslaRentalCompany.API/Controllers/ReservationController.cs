@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using TeslaRentalCompany.API.Services;
-using TeslaRentalCompany.Data.Entities;
-using TeslaRentalCompany.Data.Models;
+using TeslaRentalCompany.API.Entities;
+using TeslaRentalCompany.API.Models;
 
 namespace TeslaRentalCompany.API.Controllers
 {

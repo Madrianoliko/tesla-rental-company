@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using TeslaRentalCompany.Data.Entities;
-using TeslaRentalCompany.Data.Models;
+using TeslaRentalCompany.API.Entities;
+using TeslaRentalCompany.API.Models;
 
 namespace TeslaRentalCompany.API.Profiles
 {

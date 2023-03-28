@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TeslaRentalCompany.Data.Entities
+namespace TeslaRentalCompany.API.Entities
 {
     public class CarDealership
     {

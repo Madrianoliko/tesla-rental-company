@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TeslaRentalCompany.API.Services;
-using TeslaRentalCompany.Data.Models;
+using TeslaRentalCompany.API.Models;
 
 namespace TeslaRentalCompany.API.Controllers
 {

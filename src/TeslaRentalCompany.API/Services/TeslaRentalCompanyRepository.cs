@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.X509Certificates;
 using TeslaRentalCompany.API.DbContexts;
-using TeslaRentalCompany.Data.Entities;
-using TeslaRentalCompany.Data.Models;
+using TeslaRentalCompany.API.Entities;
 
 namespace TeslaRentalCompany.API.Services
 {
@@ -34,7 +32,7 @@ namespace TeslaRentalCompany.API.Services
         }
         public async Task<IEnumerable<Car>> GetCarsAsync(string? model)
         {
-            if(string.IsNullOrEmpty(model))
+            if (string.IsNullOrEmpty(model))
             {
                 return await GetCarsAsync();
             }

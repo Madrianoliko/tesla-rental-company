@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TeslaRentalCompany.Data.Entities;
-using TeslaRentalCompany.Data.Models;
+using TeslaRentalCompany.API.Entities;
 
 namespace TeslaRentalCompany.API.DbContexts
 {
