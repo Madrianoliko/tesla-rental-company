@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TeslaRentalCompany.API.Entities;
 using TeslaRentalCompany.API.Models;
@@ -20,6 +21,7 @@ namespace TeslaRentalCompany.API.Controllers
         public ITeslaRentalCompanyRepository Repository { get; }
         public IMapper Mapper { get; }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CarDealershipWithoutCarsDto>>> GetCarDealershipsAsync()
         {
@@ -27,6 +29,7 @@ namespace TeslaRentalCompany.API.Controllers
             return Ok(Mapper.Map<IEnumerable<CarDealershipWithoutCarsDto>>(carDealershipEntities));
         }
 
+        [Authorize]
         [HttpGet("{carDealershipId}", Name = "GetCarDealership")]
         public async Task<ActionResult<CarDealershipDto>> GetCarDealershipAsync(int carDealershipId,
             bool includeCars = false)
@@ -44,6 +47,7 @@ namespace TeslaRentalCompany.API.Controllers
             }
         }
 
+        [Authorize(Policy = "MustBeAdmin")]
         [HttpPost]
         public async Task<ActionResult<CarDealershipDto>> CreateCarDealershipAsync(CarDealershipForCreationDto carDealership)
         {
@@ -65,6 +69,7 @@ namespace TeslaRentalCompany.API.Controllers
                 createdCarDealershipToReturn);
         }
 
+        [Authorize(Policy = "MustBeAdmin")]
         [HttpPut("{carDealershipId}")]
         public async Task<ActionResult<CarDealershipDto>> UpdateCarDealershipAsync(int carDealershipId, CarDealershipForUpdatingDto carDealership)
         {
@@ -77,6 +82,8 @@ namespace TeslaRentalCompany.API.Controllers
 
             return NoContent();
         }
+
+        [Authorize(Policy = "MustBeAdmin")]
         [HttpDelete("{carDealershipId}")]
         public async Task<ActionResult> DeleteCarDealership(int carDealershipId)
         {

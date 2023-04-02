@@ -9,7 +9,7 @@ using TeslaRentalCompany.API.Models;
 namespace TeslaRentalCompany.API.Controllers
 {
     [Route("api/reservation")]
-    //[Authorize(Policy = "MustBeAdmin")]
+    
     [ApiController]
     public class ReservationController : ControllerBase
     {
@@ -27,6 +27,7 @@ namespace TeslaRentalCompany.API.Controllers
         public ITeslaRentalCompanyRepository Repository { get; }
         public IMapper Mapper { get; }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReservationDto>>> GetReservationsAsync()
         {
@@ -34,6 +35,8 @@ namespace TeslaRentalCompany.API.Controllers
 
             return Ok(Mapper.Map<IEnumerable<ReservationDto>>(reservationEntities));
         }
+
+        [Authorize]
         [HttpGet("{reservationId}", Name = "GetReservation")]
         public async Task<IActionResult> GetReservationAsync(int reservationId)
         {
@@ -46,6 +49,7 @@ namespace TeslaRentalCompany.API.Controllers
             return Ok(Mapper.Map<ReservationDto>(reservationForCar));
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<ReservationDto>> CreateReservation(int carId, int userId,
             ReservationForCreationDto reservation)
@@ -77,7 +81,7 @@ namespace TeslaRentalCompany.API.Controllers
                 },
                 createdReservationToReturn);
         }
-
+        [Authorize]
         [HttpPut("{reservationId}")]
         public async Task<ActionResult> UpdateReservation(
             int reservationId,
@@ -96,6 +100,8 @@ namespace TeslaRentalCompany.API.Controllers
 
             return NoContent();
         }
+
+        [Authorize(Policy = "MustBeAdmin")]
         [HttpDelete("{reservationId}")]
         public async Task<ActionResult> DeleteReservation(int reservationId)
         {

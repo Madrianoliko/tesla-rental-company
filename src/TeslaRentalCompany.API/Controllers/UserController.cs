@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TeslaRentalCompany.API.Entities;
 using TeslaRentalCompany.API.Models;
@@ -7,6 +8,7 @@ using TeslaRentalCompany.API.Services;
 namespace TeslaRentalCompany.API.Controllers
 {
     [Route("api/user")]
+    [Authorize]
     [ApiController]
     public class UserController : ControllerBase
     {
